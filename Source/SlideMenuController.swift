@@ -355,7 +355,7 @@ public class SlideMenuController: UIViewController, UIGestureRecognizerDelegate 
                 let translation: CGPoint = panGesture.translationInView(panGesture.view!)
                 leftContainerView.frame = applyLeftTranslation(translation, toFrame: LeftPanState.frameAtStartOfPan)
                 applyLeftOpacity()
-                applyLeftContentViewScale()
+                applyLeftContentViewTransformTranslation()
             case UIGestureRecognizerState.Ended, UIGestureRecognizerState.Cancelled:
                 if LeftPanState.lastState != .Changed {
                     return
@@ -487,7 +487,7 @@ public class SlideMenuController: UIViewController, UIGestureRecognizerDelegate 
             if let strongSelf = self {
                 strongSelf.leftContainerView.frame = frame
                 strongSelf.opacityView.layer.opacity = Float(SlideMenuOptions.contentViewOpacity)
-                strongSelf.mainContainerView.transform = CGAffineTransformMakeScale(SlideMenuOptions.contentViewScale, SlideMenuOptions.contentViewScale)
+                strongSelf.mainContainerView.transform = CGAffineTransformMakeTranslation(SlideMenuOptions.leftViewWidth, 0)
             }
             }) { [weak self](Bool) -> Void in
                 if let strongSelf = self {
@@ -548,7 +548,7 @@ public class SlideMenuController: UIViewController, UIGestureRecognizerDelegate 
             if let strongSelf = self {
                 strongSelf.leftContainerView.frame = frame
                 strongSelf.opacityView.layer.opacity = 0.0
-                strongSelf.mainContainerView.transform = CGAffineTransformMakeScale(1.0, 1.0)
+                strongSelf.mainContainerView.transform = CGAffineTransformMakeTranslation(0, 0)
             }
             }) { [weak self](Bool) -> Void in
                 if let strongSelf = self {
@@ -803,10 +803,10 @@ public class SlideMenuController: UIViewController, UIGestureRecognizerDelegate 
         opacityView.layer.opacity = Float(opacity)
     }
     
-    private func applyLeftContentViewScale() {
-        let openedLeftRatio: CGFloat = getOpenedLeftRatio()
-        let scale: CGFloat = 1.0 - ((1.0 - SlideMenuOptions.contentViewScale) * openedLeftRatio);
-        mainContainerView.transform = CGAffineTransformMakeScale(scale, scale)
+    private func applyLeftContentViewTransformTranslation() {
+        let width: CGFloat = leftContainerView.frame.size.width
+        let currentPosition: CGFloat = leftContainerView.frame.origin.x - leftMinOrigin()
+        mainContainerView.transform = CGAffineTransformMakeTranslation(currentPosition, 0)
     }
     
     private func applyRightContentViewScale() {
